@@ -7,5 +7,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
     ViewSet para visualizar, criar, editar e deletar produtos.
     """
+
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
