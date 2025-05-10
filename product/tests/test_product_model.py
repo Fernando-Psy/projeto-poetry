@@ -7,7 +7,7 @@ class ProductModelTest(TestCase):
         # Cria uma categoria para usar nos testes
         self.category = Category.objects.create(
             name="Ficção Científica",
-            description="Livros de ficção científica e fantasia"
+            description="Livros de ficção científica e fantasia",
         )
 
         # Cria um produto associado à categoria
@@ -15,7 +15,7 @@ class ProductModelTest(TestCase):
             name="O Guia do Mochileiro das Galáxias",
             description="Uma clássica aventura espacial cheia de humor.",
             price=49.90,
-            category=self.category
+            category=self.category,
         )
 
     def test_create_category(self):
