@@ -4,33 +4,34 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     POETRY_VERSION=1.7.1 \
     POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_IN_PROJECT=false \
-    POETRY_NO_INTERACTION=1
+    POETRY_VENV_IN_PROJECT=false \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
 
+# Instalar dependências do sistema
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install "poetry==$POETRY_VERSION"
+# Instalar Poetry
+RUN pip install poetry==$POETRY_VERSION
 
 WORKDIR /app
 
-# Debug: Listar arquivos antes da cópia
-RUN ls -la .
-
-# Copiar apenas o necessário primeiro
+# Copiar arquivos de configuração do Poetry
 COPY pyproject.toml poetry.lock ./
 
-# Debug: Listar arquivos após a cópia
-RUN ls -la /app
+# Configurar Poetry e instalar dependências
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-dev --no-root \
+    && rm -rf $POETRY_CACHE_DIR
 
-# Instalar dependências
-RUN set -eux; \
-    poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-ansi
-
-# Agora copiar o restante do código
+# Copiar código da aplicação
 COPY . .
+
+# Instalar a aplicação
+RUN poetry install --no-dev
 
 EXPOSE 8000
 
