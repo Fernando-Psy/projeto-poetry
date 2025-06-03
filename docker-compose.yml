@@ -26,12 +26,19 @@ services:
       - .:/app
     ports:
       - "8000:8000"
+    networks:
+      - backend
     environment:
       - DEBUG=1
       - DATABASE_URL=postgresql://bookstore_user:bookstore_password@db:5432/bookstore
     depends_on:
       db:
         condition: service_healthy
+
+        networks: bridge
+networks:
+  backend:
+    driver: bridge
 
 volumes:
   postgres_data:
