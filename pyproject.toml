@@ -2,7 +2,7 @@
 name = "bookstore"
 version = "0.1.0"
 description = "Django bookstore API"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Fernando"]
 packages = [{include = "bookstore"}, {include = "product"}, {include = "order"}]
 
 [tool.poetry.dependencies]
@@ -12,6 +12,8 @@ djangorestframework = "3.16.0"
 django-cors-headers = "4.7.0"
 django-debug-toolbar = "5.2.0"
 django-extensions = "4.1"
+psycopg2-binary = "^2.9.10"
+dj-database-url = "^3.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "8.3.5"
