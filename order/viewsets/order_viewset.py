@@ -9,5 +9,5 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.prefetch_related("items__product").all()
     serializer_class = OrderSerializer
 
-    authentication_classes = [ BasicAuthentication, TokenAuthentication ]
+    authentication_classes = [BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAutenticated]

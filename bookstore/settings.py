@@ -30,13 +30,13 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ],
-    #"DEFAULT_PERMISSION_CLASSES": [
+    # "DEFAULT_PERMISSION_CLASSES": [
     #   "rest_framework.permissions.IsAuthenticated",
-    #],
+    # ],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
@@ -100,14 +100,13 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-'''Adicionei a configuração do banco de dados para usar o PostgreSQL,
-caso a variável de ambiente DATABASE_URL esteja definida. Se não estiver, o Django usará o banco de dados SQLite padrão.'''
+"""Adicionei a configuração do banco de dados para usar o PostgreSQL,
+caso a variável de ambiente DATABASE_URL esteja definida. Se não estiver, o Django usará o banco de dados SQLite padrão."""
 BATABASE_URL = os.environ.get("DATABASE_URL")
 if BATABASE_URL:
     import dj_database_url
-    DATABASES = {
-        "default": dj_database_url.parse(BATABASE_URL)
-    }
+
+    DATABASES = {"default": dj_database_url.parse(BATABASE_URL)}
 else:
     DATABASES = {
         "default": {
