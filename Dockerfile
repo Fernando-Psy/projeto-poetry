@@ -1,38 +1,44 @@
+# Use Python 3.11 slim image
 FROM python:3.11-slim
 
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    POETRY_VERSION=1.7.1 \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VENV_IN_PROJECT=false \
-    POETRY_NO_INTERACTION=1 \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Instalar dependências do sistema
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Instalar Poetry
-RUN pip install poetry==$POETRY_VERSION
-
+# Set work directory
 WORKDIR /app
 
-# Copiar arquivos de configuração do Poetry
-COPY pyproject.toml poetry.lock ./
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        postgresql-client \
+        build-essential \
+        libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Configurar Poetry e instalar dependências
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-dev --no-root \
-    && rm -rf $POETRY_CACHE_DIR
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar código da aplicação
+# Copy project
 COPY . .
 
-# Instalar a aplicação
-RUN poetry install --no-dev
+# Create non-root user
+RUN groupadd -r django && useradd -r -g django django
+RUN chown -R django:django /app
+USER django
 
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD python manage.py check --deploy
+
+# Expose port
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Run application
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "bookstore.wsgi:application"]
