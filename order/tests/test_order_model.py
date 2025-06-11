@@ -1,16 +1,16 @@
-import pytest
 from decimal import Decimal
 
-from order.factories import OrderFactory, OrderItemFactory
-from product.factories import ProductFactory
+from order.models.order import Order
 from rest_framework.test import APIClient
 
 
-@pytest.mark.django_db
 def test_create_order_with_items():
-    product = ProductFactory(price=Decimal("50.00"))
-    order = OrderFactory()
-    item = OrderItemFactory(order=order, product=product)
+    class Product:
+        def __init__(self):
+            self.price = Decimal("50.00")
+    product = Product()
+    order = Order.objects.create()
+    item = order.items.create(product=product, price=product.price, quantity=1)
 
     client = APIClient()
     response = client.get(f"/api/orders/{order.id}/")

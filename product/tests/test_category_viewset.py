@@ -1,8 +1,5 @@
-import pytest
 from rest_framework.test import APIClient
 
-
-@pytest.mark.django_db
 class TestCategoryViewSetNotImplemented:
     def test_category_list_returns_404_when_view_not_implemented(self):
 
