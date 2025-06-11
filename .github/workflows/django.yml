@@ -1,19 +1,65 @@
 name: Django CI
 
 on: [push]
-jobs:
-  Explore-GitHub-Actions:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Explore GitHub Actions"
-      - run: echo "This is a simple workflow to explore GitHub Actions."
-      - run: echo "You can add more steps to this workflow as needed."
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - run: echo "Code checked out successfully ${{ github.repository }}."
-      - run: echo "This is a placeholder for your Django CI workflow."
-      - name: Run Django tests
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "Django tests completed is ${{ job.status }}."
 
+jobs:
+  Django-CI:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: bookstore
+          POSTGRES_USER: bookstore_user
+          POSTGRES_PASSWORD: bookstore_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Install Poetry
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+
+    - name: Set up cache
+      uses: actions/cache@v2
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          venv-${{ runner.os }}-
+
+    - name: Install dependencies
+      run: poetry install --no-root
+
+    - name: Set up environment variables
+      run: |
+        echo "DATABASE_URL=postgresql://bookstore_user:bookstore_password@localhost:5432/bookstore" >> ${GITHUB_ENV}
+
+    - name: Run migrations
+      run: poetry run python manage.py migrate
+
+    - name: Run tests
+      run: poetry run python manage.py test
+
+    - name: Notify success
+      if: success()
+      run: echo "Django tests completed successfully."
+
+    - name: Notify failure
+      if: failure()
+      run: echo "Django tests failed."
