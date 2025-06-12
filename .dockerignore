@@ -50,3 +50,4 @@ ENV/
 .env
 .DS_Store
 node_modules/
+db.sqlite3

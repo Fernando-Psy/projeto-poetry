@@ -102,11 +102,11 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 
 """Adicionei a configuração do banco de dados para usar o PostgreSQL,
 caso a variável de ambiente DATABASE_URL esteja definida. Se não estiver, o Django usará o banco de dados SQLite padrão."""
-BATABASE_URL = os.environ.get("DATABASE_URL")
-if BATABASE_URL:
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
     import dj_database_url
 
-    DATABASES = {"default": dj_database_url.parse(BATABASE_URL)}
+    DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
 else:
     DATABASES = {
         "default": {
@@ -115,6 +115,17 @@ else:
         }
     }
 
+import django_heroku
+import dj_database_url
+
+django_heroku.settings(locals())
+
+if 'DATABASE_URL' in os.environ:
+    DEBUG = False
+    ALLOWED_HOSTS = ['*']
+
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -151,6 +162,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
