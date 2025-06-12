@@ -4,10 +4,9 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  test:
+  heroku-deploy:
     runs-on: ubuntu-latest
 
     services:
@@ -61,7 +60,7 @@ jobs:
       run: poetry run python manage.py test
 
   deploy:
-    needs: test
+    needs: heroku-deploy
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'  # só faz deploy da branch main
 
