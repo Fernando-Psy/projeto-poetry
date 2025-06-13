@@ -1,6 +1,6 @@
 name: Django CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   Django-CI:
@@ -17,49 +17,72 @@ jobs:
           - 5432:5432
         options: >-
           --health-cmd pg_isready
-          --health-interval 30s
-          --health-timeout 20s
+          --health-interval 10s
+          --health-timeout 5s
           --health-retries 5
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: '3.11'
 
     - name: Install Poetry
       run: |
         python -m pip install --upgrade pip
-        pip install poetry
+        pip install poetry==1.7.1
+
+    - name: Configure Poetry
+      run: |
+        poetry config virtualenvs.create true
+        poetry config virtualenvs.in-project true
 
     - name: Set up cache
       uses: actions/cache@v3
       with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+        path: |
+          .venv
+          ~/.cache/pypoetry
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('**/pyproject.toml') }}
         restore-keys: |
           venv-${{ runner.os }}-
 
     - name: Install dependencies
-      run: poetry install --no-root
+      run: |
+        poetry install --no-root --with dev
+
+    - name: Wait for PostgreSQL
+      run: |
+        until pg_isready -h localhost -p 5432 -U bookstore_user; do
+          echo "Waiting for PostgreSQL..."
+          sleep 2
+        done
 
     - name: Set up environment variables
       run: |
         echo "DATABASE_URL=postgresql://bookstore_user:bookstore_password@localhost:5432/bookstore" >> ${GITHUB_ENV}
+        echo "DEBUG=True" >> ${GITHUB_ENV}
 
     - name: Run migrations
-      run: poetry run python manage.py migrate
+      run: |
+        poetry run python manage.py migrate --noinput
 
     - name: Run tests
-      run: poetry run python manage.py test
+      run: |
+        poetry run python manage.py test --verbosity=2
+
+    - name: Run linting (optional)
+      run: |
+        poetry run black --check .
+      continue-on-error: true
 
     - name: Notify success
       if: success()
-      run: echo "Django tests completed successfully."
+      run: echo "✅ Django tests completed successfully."
 
     - name: Notify failure
       if: failure()
-      run: echo "Django tests failed."
+      run: echo "❌ Django tests failed."

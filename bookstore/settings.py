@@ -102,11 +102,11 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 
 """Adicionei a configuração do banco de dados para usar o PostgreSQL,
 caso a variável de ambiente DATABASE_URL esteja definida. Se não estiver, o Django usará o banco de dados SQLite padrão."""
-BATABASE_URL = os.environ.get("DATABASE_URL")
-if BATABASE_URL:
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
     import dj_database_url
 
-    DATABASES = {"default": dj_database_url.parse(BATABASE_URL)}
+    DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
 else:
     DATABASES = {
         "default": {
