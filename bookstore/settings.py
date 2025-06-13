@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure--8h&@*d11b#mthic!+!7hfls-=okpi(e!9d+o=7cb!v_hq-590
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ebac-api-bookstore.herokuapp.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]
 
 
 REST_FRAMEWORK = {
@@ -62,8 +62,13 @@ INSTALLED_APPS = [
     "order",
 ]
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -71,7 +76,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = "bookstore.urls"
@@ -99,11 +103,11 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 
 """Adicionei a configuração do banco de dados para usar o PostgreSQL,
 caso a variável de ambiente DATABASE_URL esteja definida. Se não estiver, o Django usará o banco de dados SQLite padrão."""
-DATABASE_URL = os.environ.get("DATABASE_URL")
-if DATABASE_URL:
+BATABASE_URL = os.environ.get("DATABASE_URL")
+if BATABASE_URL:
     import dj_database_url
 
-    DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
+    DATABASES = {"default": dj_database_url.parse(BATABASE_URL)}
 else:
     DATABASES = {
         "default": {
@@ -112,17 +116,6 @@ else:
         }
     }
 
-import django_heroku
-import dj_database_url
-
-django_heroku.settings(locals())
-
-if 'DATABASE_URL' in os.environ:
-    DEBUG = False
-    ALLOWED_HOSTS = ['*']
-
-db_from_env = dj_database_url.config(conn_max_age=600)
-DATABASES['default'].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -159,10 +152,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
