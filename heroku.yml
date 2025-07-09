@@ -1,0 +1,11 @@
+build:
+  docker:
+    web: Dockerfile
+
+run:
+  web: gunicorn bookstore.wsgi:application --bind 0.0.0.0:$PORT --workers 3
+
+release:
+  image: web
+  command:
+    - python manage.py migrate --noinput
