@@ -16,7 +16,11 @@ psycopg2-binary = "^2.9.10"
 dj-database-url = "^3.0.0"
 python-decouple = "^3.8"
 django-heroku = "^0.3.1"
+<<<<<<< HEAD
 gunicorn = "^21.1.0"
+=======
+gunicorn = "^20.1.0"
+>>>>>>> 56defde119143aace1a6c24c9fe129e454fc0040
 whitenoise = "^6.6.0"
 
 [tool.poetry.group.dev.dependencies]
