@@ -8,14 +8,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     POETRY_NO_INTERACTION=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
-# Instalar dependências do sistema
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
+# Instala dependências do sistema
+RUN apt-get update && apt-get install -y \
+    gcc \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar Poetry
-RUN pip install poetry==$POETRY_VERSION
+# Instalar Poetry (método recomendado)
+RUN curl -sSL https://install.python-poetry.org | python3 - --version $POETRY_VERSION && \
+    ln -s $POETRY_HOME/bin/poetry /usr/local/bin/poetry
 
 WORKDIR /app
 
@@ -29,10 +30,11 @@ RUN poetry config virtualenvs.create false \
 
 # Copiar código da aplicação
 COPY . .
-
 # Instalar a aplicação
-RUN poetry install --no-dev
+# (já instalado anteriormente, este passo é redundante e pode causar problemas)
+# RUN poetry install --no-dev
 
+EXPOSE 8000
 EXPOSE 8000
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
