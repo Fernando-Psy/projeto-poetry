@@ -106,7 +106,12 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 caso a variável de ambiente DATABASE_URL esteja definida. Se não estiver, o Django usará o banco de dados SQLite padrão."""
 BATABASE_URL = os.environ.get("DATABASE_URL")
 if BATABASE_URL:
-    DATABASES = {"default"}
+    DATABASES = {
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'),
+                                      conn_max_age=600,
+                                      ssl_require=True
+                                      )
+}
 else:
     DATABASES = {
         "default": {

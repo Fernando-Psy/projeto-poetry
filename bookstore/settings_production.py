@@ -5,6 +5,7 @@ Production settings for bookstore project.
 from .settings import *
 from decouple import config
 import dj_database_url
+import os
 
 # SECURITY
 DEBUG = False
