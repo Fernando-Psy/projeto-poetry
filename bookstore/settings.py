@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure--8h&@*d11b#mthic!+!7hfls-=okpi(e!9d+o=7cb!v_hq-590
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "https://bookstore-fcbj-api-dd2558886ea1.herokuapp.com/"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "projeto-poetry-0825d30167f7.herokuapp.com/"]
 
 
 REST_FRAMEWORK = {
