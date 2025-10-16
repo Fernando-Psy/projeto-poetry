@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import  dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ SECRET_KEY = "django-insecure--8h&@*d11b#mthic!+!7hfls-=okpi(e!9d+o=7cb!v_hq-590
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "https://bookstore-fcbj-api-dd2558886ea1.herokuapp.com/"]
 
 
 REST_FRAMEWORK = {
@@ -105,9 +106,7 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 caso a variável de ambiente DATABASE_URL esteja definida. Se não estiver, o Django usará o banco de dados SQLite padrão."""
 BATABASE_URL = os.environ.get("DATABASE_URL")
 if BATABASE_URL:
-    import dj_database_url
-
-    DATABASES = {"default": dj_database_url.parse(BATABASE_URL)}
+    DATABASES = {"default"}
 else:
     DATABASES = {
         "default": {
