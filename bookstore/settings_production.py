@@ -50,7 +50,7 @@ LOGGING = {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": "/var/log/django/bookstore.log",
-            "maxBytes": 1024 * 1024 * 10,  # 10MB
+            "maxBytes": 1024 * 1024 * 10,
             "backupCount": 5,
             "formatter": "verbose",
         },
