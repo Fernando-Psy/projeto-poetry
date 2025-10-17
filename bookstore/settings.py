@@ -103,12 +103,19 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 DATABASE_URL = config("DATABASE_URL", default=None)
 
 if DATABASE_URL:
+    db_config = dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+    )
+
+    # SSL apenas em produção (Heroku)
+    if not DEBUG:
+        db_config["OPTIONS"] = {
+            "sslmode": "require",
+        }
+
     DATABASES = {
-        "default": dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=not DEBUG,
-        )
+        "default": db_config
     }
 else:
     DATABASES = {
