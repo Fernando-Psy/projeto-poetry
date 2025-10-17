@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-import  dj_database_url
+import dj_database_url
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure--8h&@*d11b#mthic!+!7hfls-=okpi(e!9d+o=7cb!v_hq-590"
+SECRET_KEY = config("SECRET_KEY", default="django-insecure-dev-key-change-in-production")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = ['projeto-poetry-0825d30167f7.herokuapp.com']
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
 
 
 REST_FRAMEWORK = {
@@ -35,9 +36,6 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
-    # "DEFAULT_PERMISSION_CLASSES": [
-    #   "rest_framework.permissions.IsAuthenticated",
-    # ],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
@@ -102,16 +100,16 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-"""Adicionei a configuração do banco de dados para usar o PostgreSQL,
-caso a variável de ambiente DATABASE_URL esteja definida. Se não estiver, o Django usará o banco de dados SQLite padrão."""
-BATABASE_URL = os.environ.get("DATABASE_URL")
-if BATABASE_URL:
+DATABASE_URL = config("DATABASE_URL", default=None)
+
+if DATABASE_URL:
     DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'),
-                                      conn_max_age=600,
-                                      ssl_require=True
-                                      )
-}
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=not DEBUG,
+        )
+    }
 else:
     DATABASES = {
         "default": {
@@ -156,12 +154,97 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-MEDIA_URL = '/media/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+MEDIA_URL = "/media/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Security Settings for Production
+# https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    X_FRAME_OPTIONS = "DENY"
+
+
+# Logging Configuration
+# https://docs.djangoproject.com/en/5.2/topics/logging/
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "bookstore": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+
+# Cache Configuration (Redis for production, recommended)
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django.core.cache.backends.redis.RedisCache",
+#         "LOCATION": config("REDIS_URL", default="redis://127.0.0.1:6379/1"),
+#     }
+# }
+
+# Email Configuration (for production use)
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = config("EMAIL_HOST", default="localhost")
+# EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+# EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+# EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+# EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+# DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@bookstore.com")
+
+
+# Remove debug toolbar in production
+if not DEBUG and "debug_toolbar" in INSTALLED_APPS:
+    INSTALLED_APPS.remove("debug_toolbar")
+    if "debug_toolbar.middleware.DebugToolbarMiddleware" in MIDDLEWARE:
+        MIDDLEWARE.remove("debug_toolbar.middleware.DebugToolbarMiddleware")
+
+
+# CORS Configuration (if using frontend)
+# CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="").split(",")
+# CORS_ALLOW_CREDENTIALS = True

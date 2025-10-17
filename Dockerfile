@@ -8,33 +8,29 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     POETRY_NO_INTERACTION=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
-# Instala dependências do sistema
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar Poetry (método recomendado)
+# Install Poetry (recommended method)
 RUN curl -sSL https://install.python-poetry.org | python3 - --version $POETRY_VERSION && \
     ln -s $POETRY_HOME/bin/poetry /usr/local/bin/poetry
 
 WORKDIR /app
 
-# Copiar arquivos de configuração do Poetry
+# Copy Poetry configuration files
 COPY pyproject.toml poetry.lock ./
 
-# Configurar Poetry e instalar dependências
+# Configure Poetry and install dependencies
 RUN poetry config virtualenvs.create false \
     && poetry install --no-dev --no-root \
     && rm -rf $POETRY_CACHE_DIR
 
-# Copiar código da aplicação
+# Copy application code
 COPY . .
-# Instalar a aplicação
-# (já instalado anteriormente, este passo é redundante e pode causar problemas)
-# RUN poetry install --no-dev
 
-EXPOSE 8000
 EXPOSE 8000
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
