@@ -1,25 +1,26 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
+# Instala dependências do sistema (se precisar)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Instala o Poetry
+RUN pip install --upgrade pip
 RUN pip install poetry
-ENV PATH="{PATH}:/root/.local/bin"
 
-# Instala as dependências do projeto
-RUN poetry config virtualenvs.create false \
-    && poetry install --only=main --no-root
+# Adiciona o poetry ao PATH (caso necessário)
+ENV PATH="/root/.local/bin:${PATH}"
 
-RUN apt-get update && apt-get install -y \
-    build-essential
-    
-# Copia apenas o necessário para instalar as dependências
 COPY pyproject.toml poetry.lock ./
 
-# Copia o restante do código do projeto
+# Instala libs sem criar virtualenv
+RUN poetry config virtualenvs.create false
+RUN poetry install --only=main --no-root
+
+# Copia o restante
 COPY . .
 
-# Coleta arquivos estáticos
-RUN python manage.py collectstatic --noinput
-
-CMD ["gunicorn", "bookstore.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "seu_projeto.wsgi"]
