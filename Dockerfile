@@ -2,13 +2,6 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copia apenas o necessário para instalar as dependências
-COPY pyproject.toml poetry.lock ./
-
 # Instala o Poetry
 RUN pip install poetry
 ENV PATH="{PATH}:/root/.local/bin"
@@ -16,6 +9,12 @@ ENV PATH="{PATH}:/root/.local/bin"
 # Instala as dependências do projeto
 RUN poetry config virtualenvs.create false \
     && poetry install --only=main --no-root
+
+RUN apt-get update && apt-get install -y \
+    build-essential
+    
+# Copia apenas o necessário para instalar as dependências
+COPY pyproject.toml poetry.lock ./
 
 # Copia o restante do código do projeto
 COPY . .
