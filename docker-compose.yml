@@ -1,43 +1,11 @@
-services:
-  db:
-    image: postgres:15-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      POSTGRES_DB: bookstore
-      POSTGRES_USER: bookstore_user
-      POSTGRES_PASSWORD: bookstore_password
-    ports:
-      - "5432:5432"
-    networks:
-      - backend
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U bookstore_user -d bookstore" ]
-      interval: 20s
-      timeout: 30s
-      retries: 5
+version: '3.8'
 
+services:
   web:
     build: .
-    command: >
-      sh -c "sleep 30s && python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/app
     ports:
       - "8000:8000"
-    networks:
-      - backend
-    environment:
-      - DEBUG=1
-      - DATABASE_URL=postgresql://bookstore_user:bookstore_password@db:5432/bookstore
-    depends_on:
-      db:
-        condition: service_healthy
-
-networks:
-  backend:
-    driver: bridge
-
-volumes:
-  postgres_data:
+    env_file:
+      - .env
+    volumes:
+      - .:/app
