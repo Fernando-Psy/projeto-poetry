@@ -7,6 +7,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    python3-dev \
+    libpq-dev \
+    build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Instala o Poetry
 RUN pip install --upgrade pip
 RUN pip install poetry
