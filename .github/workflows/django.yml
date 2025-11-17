@@ -12,7 +12,7 @@ jobs:
     env:
       DJANGO_SETTINGS_MODULE: bookstore.settings
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db?sslmode=disable
 
     services:
       postgres:
