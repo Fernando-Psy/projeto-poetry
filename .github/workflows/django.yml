@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: bookstore.settings
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db  # opcional, se usar dj-database-url
+      secret_KEY: ${{ secrets.SECRET_KEY }}
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
 
     services:
       postgres:
