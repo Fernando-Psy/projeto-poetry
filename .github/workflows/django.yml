@@ -11,8 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: bookstore.settings
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db?sslmode=disable
+      SECRET_KEY: test-secret-key-for-ci
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      DEBUG: "True"
 
     services:
       postgres:

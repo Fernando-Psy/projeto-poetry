@@ -104,6 +104,9 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Database
+# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
 DATABASE_URL = config("DATABASE_URL", default=None)
 
 if DATABASE_URL:
@@ -112,8 +115,9 @@ if DATABASE_URL:
         conn_max_age=600,
     )
 
-    # SSL apenas em produção (Heroku)
-    if not DEBUG:
+    # SSL apenas em produção (Heroku) - detecta pelo hostname ou variável DEBUG
+    # Em CI (GitHub Actions) e desenvolvimento local, não usa SSL
+    if not DEBUG and 'herokuapp.com' in DATABASE_URL:
         db_config["OPTIONS"] = {
             "sslmode": "require",
         }
@@ -122,13 +126,13 @@ if DATABASE_URL:
         "default": db_config
     }
 else:
+    # Fallback para SQLite em desenvolvimento sem DATABASE_URL
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
