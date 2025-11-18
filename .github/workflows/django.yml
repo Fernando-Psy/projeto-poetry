@@ -34,7 +34,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install Poetry
         run: |
@@ -47,8 +47,9 @@ jobs:
       - name: Run migrations
         run: python manage.py migrate
 
-      - name: Run tests
-        run: python manage.py test  # ✅ Correto!
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=product --cov=order --cov-report=term-missing --cov-report=html -v
 
   deploy:
     needs: test
