@@ -2,9 +2,9 @@ name: Django CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   test:
@@ -57,6 +57,9 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
+
+      - name: Unshallow repository
+        run: git fetch --all --unshallow
 
       - name: Add Heroku remote and push
         run: |
