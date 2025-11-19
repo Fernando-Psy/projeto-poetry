@@ -54,9 +54,11 @@ jobs:
 
   heroku-deploy:
     runs-on: ubuntu-latest
+    needs: test
     steps:
-      - name: Deploy to Heroku
-        if: success()
-        run:
-          git remote add heroku https://git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
-          git push heroku main
+      - uses: actions/checkout@v4
+
+      - name: Add Heroku remote and push
+        run: |
+          git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
+          git push heroku main --force
