@@ -58,7 +58,7 @@ jobs:
       - name: Deploy to Heroku
         uses: actions/checkout@v4
       - name: Heroku Deploy
-        uses: akshaykumar6/heroku-deploy@v3.12.12
+        uses: heroku/deploy-to-heroku@v2
         with:
           email: ${{ secrets.HEROKU_EMAIL }}
           api_key: ${{ secrets.HEROKU_API_KEY }}
