@@ -18,6 +18,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip install --upgrade pip
 RUN pip install poetry
 
+# Coletar arquivos estáticos
+RUN python manage.py collectstatic --noinput
+
 # Adiciona o poetry ao PATH (caso necessário)
 ENV PATH="/root/.local/bin:${PATH}"
 
@@ -30,4 +33,4 @@ RUN poetry install --only=main --no-root
 # Copia o restante
 COPY . .
 
-CMD ["gunicorn", "seu_projeto.wsgi"]
+CMD ["gunicorn", "projeto-poetry.wsgi"]
